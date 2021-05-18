@@ -57,7 +57,7 @@ while True:
     line = f.readline().rstrip()
     if line[0] == '@':
         # Read expected output from a file
-        of = open(line[1:-1], "r", newline='\n')
+        of = open(line[1:], "r", newline='\n')
         expected = of.read();
         of.close();
     elif line[0] == '~':
