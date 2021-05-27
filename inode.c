@@ -8,6 +8,7 @@
 
 #define INODES_PER_BLOCK (DISKIMG_SECTOR_SIZE/sizeof(struct inode))
 #define NUM_BLOCK_NUMS_PER_BLOCK (DISKIMG_SECTOR_SIZE/sizeof(uint16_t))
+#define NUM_IADDR ((int)(sizeof(inp->i_addr)/sizeof(uint16_t)))
 
 int inode_iget(struct unixfilesystem *fs, int inumber, struct inode *inp) {
 	int fd = fs->dfd;
@@ -39,8 +40,8 @@ int inode_indexlookup(struct unixfilesystem *fs, struct inode *inp, int blockNum
 	
     if (inp->i_mode & ILARG) {
 		int i_addr_idx = blockNum / NUM_BLOCK_NUMS_PER_BLOCK;
-		if (i_addr_idx >= 7) {
-			blockNum -= NUM_BLOCK_NUMS_PER_BLOCK*7;
+		if (i_addr_idx >= (NUM_IADDR-1)) {
+			blockNum -= NUM_BLOCK_NUMS_PER_BLOCK*(NUM_IADDR-1);
 			int first_idx = blockNum / NUM_BLOCK_NUMS_PER_BLOCK;
 			if (first_idx < 0 || first_idx >= (int)NUM_BLOCK_NUMS_PER_BLOCK) {
 				fprintf(stderr, "Invalid first index: %d\n", first_idx);
@@ -48,7 +49,7 @@ int inode_indexlookup(struct unixfilesystem *fs, struct inode *inp, int blockNum
 			}
 			uint16_t buf[NUM_BLOCK_NUMS_PER_BLOCK];
 		
-			if ((read = diskimg_readsector(fd, inp->i_addr[7], buf)) != DISKIMG_SECTOR_SIZE) {
+			if ((read = diskimg_readsector(fd, inp->i_addr[(NUM_IADDR-1)], buf)) != DISKIMG_SECTOR_SIZE) {
 				fprintf(stderr, "Invalid read of sector: %d. Only read %d bytes.\n", inp->i_addr[i_addr_idx], read);
 				return -1;
 			}
@@ -68,7 +69,7 @@ int inode_indexlookup(struct unixfilesystem *fs, struct inode *inp, int blockNum
 		return buf[blockNum % NUM_BLOCK_NUMS_PER_BLOCK];
 		
 	} else {
-		if (blockNum < 8) return inp->i_addr[blockNum];
+		if (blockNum <= (NUM_IADDR-1)) return inp->i_addr[blockNum];
 		fprintf(stderr, "Small inode addressing but block num is: %d\n", blockNum);
 	}
 	
