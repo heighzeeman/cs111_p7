@@ -42,7 +42,7 @@ static int tokenize(const char *line, char *tokens[], int maxTokens) {
 }
 
 int pathname_lookup(struct unixfilesystem *fs, const char *pathname) {
-    int numslashes = 0;
+    int numslashes = 1;
 	for (const char *c = pathname; *c; c++)
 		if (*c == '/') ++numslashes;
 	
