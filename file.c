@@ -25,7 +25,7 @@ int file_getblock(struct unixfilesystem *fs, int inumber, int blockNum, void *bu
 	}
 	
 	int inode_size = inode_getsize(&inp);
-	if (blockNum == inode_size/DISKIMG_SECTOR_SIZE) return inode_size % DISKIMG_SECTOR_SIZE; 
+	if (blockNum == inode_size/DISKIMG_SECTOR_SIZE) return inode_size%DISKIMG_SECTOR_SIZE; 
 	
     return DISKIMG_SECTOR_SIZE;
 }
